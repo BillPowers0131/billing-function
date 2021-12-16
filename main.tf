@@ -1,19 +1,18 @@
 #####################################################################
-######     Enable the Vision API Service 
+######     Enable the Cloud Billing API Service
 #####################################################################
-
-resource "google_project_service" "enable_vision_api" {
+resource "google_project_service" "enable_cloudbilling_api" {
   project = var.project_id
-  service = "vision.googleapis.com"
+  service = "cloudbilling.googleapis.com"
 }
 
 #####################################################################
-######     Enable the Translate API Service
+######     Enable the Billing Budgets API Service 
 #####################################################################
 
-resource "google_project_service" "enable_translate_api" {
+resource "google_project_service" "enable_billing_budgets_api" {
   project = var.project_id
-  service = "translate.googleapis.com"
+  service = "billingbudgets.googleapis.com"
 }
 
 #####################################################################
@@ -32,7 +31,7 @@ resource "google_project_service" "enable_cloud_functions_api" {
 resource "google_project_service" "enable_cloud_build_api" {
   project = var.project_id
   service = "cloudbuild.googleapis.com"
-  }
+}
 
 #####################################################################
 ######     Enable the Cloud Pub/Sub API Service
@@ -43,135 +42,127 @@ resource "google_project_service" "enable_cloud_pubsub_api" {
   service = "pubsub.googleapis.com"
 }
 
-#####################################################################
-######     Enable the Container Registry API Service
-#####################################################################
-resource "google_project_service" "enable_container_registry_api" {
-  project = var.project_id
-  service = "containerregistry.googleapis.com"
-}
+# #####################################################################
+# ######     Create Cloud Storage bucket for image input
+# #####################################################################
 
-#####################################################################
-######     Create Cloud Storage bucket for image input
-#####################################################################
+# resource "google_storage_bucket" "image_input_bucket" {
+#     project = var.project_id
+#     name     = "${var.project_id}-image-input"
+#     location = var.region
+# }
 
-resource "google_storage_bucket" "image_input_bucket" {
-    project = var.project_id
-    name     = "${var.project_id}-image-input"
-    location = var.region
-}
+# #####################################################################
+# ######     Create Cloud Storage bucket for Translation/OCR output
+# #####################################################################
 
-#####################################################################
-######     Create Cloud Storage bucket for Translation/OCR output
-#####################################################################
+# resource "google_storage_bucket" "image_output_bucket" {
+#     project = var.project_id
+#     name     = "${var.project_id}-image-output"
+#     location = var.region
+# }
 
-resource "google_storage_bucket" "image_output_bucket" {
-    project = var.project_id
-    name     = "${var.project_id}-image-output"
-    location = var.region
-}
+# #########################################################################################
+# ######   Build the Pub/Sub Translate Topic
+# ##########################################################################################
 
-#########################################################################################
-######   Build the Pub/Sub Translate Topic
-##########################################################################################
+# resource "google_pubsub_topic" "translate_topic" {
+#   name = "translate_topic"
+#   project = var.project_id
+# }
 
-resource "google_pubsub_topic" "translate_topic" {
-  name = "translate_topic"
-  project = var.project_id
-}
+# #########################################################################################
+# ######   Build the Pub/Sub Result Topic
+# ##########################################################################################
 
-#########################################################################################
-######   Build the Pub/Sub Result Topic
-##########################################################################################
+# resource "google_pubsub_topic" "result_topic" {
+#   name = "result_topic"
+#   project = var.project_id
+# }
 
-resource "google_pubsub_topic" "result_topic" {
-  name = "result_topic"
-  project = var.project_id
-}
+# ##########################################################################################
+# ######      Build and depoly Google Cloud Function for OCR extraction upon input 
+# ######      file upload to input bucket
+# ##########################################################################################
 
-##########################################################################################
-######      Build and depoly Google Cloud Function for OCR extraction upon input 
-######      file upload to input bucket
-##########################################################################################
+# resource "google_cloudfunctions_function" "process_image" {
+#   name        = "process_image"
+#   description = "process image from uploaded file"
+#   runtime     = "python39"
+#   region      = "us-central1"
+#   project     = var.project_id
 
-resource "google_cloudfunctions_function" "process_image" {
-  name        = "process_image"
-  description = "process image from uploaded file"
-  runtime     = "python39"
-  region      = "us-central1"
-  project     = var.project_id
+#   available_memory_mb   = 128
+#   source_archive_bucket = "terraform1hwp"
+#   source_archive_object = "function-source.zip"
+#   timeout               = 60
+#   entry_point           = "process_image"
 
-  available_memory_mb   = 128
-  source_archive_bucket = "terraform1hwp"
-  source_archive_object = "function-source.zip"
-  timeout               = 60
-  entry_point           = "process_image"
+#   environment_variables = {
+#     GCP_PROJECT="${var.project_id}",
+#     TRANSLATE_TOPIC="translate_topic",
+#     RESULT_TOPIC="result_topic",
+#     TO_LANG="es,en,fr,ja",
+#   }
 
-  environment_variables = {
-    GCP_PROJECT="${var.project_id}",
-    TRANSLATE_TOPIC="translate_topic",
-    RESULT_TOPIC="result_topic",
-    TO_LANG="es,en,fr,ja",
-  }
+#   event_trigger {
+#     event_type = "google.storage.object.finalize"
+#     resource = "${var.project_id}-image-input"
+#   }
+# }
 
-  event_trigger {
-    event_type = "google.storage.object.finalize"
-    resource = "${var.project_id}-image-input"
-  }
-}
+# #########################################################################################
+# #######    Build and deploy the text translation Google Cloud function
+# #######    with a Cloud Pub/Sub trigger, 
+# #########################################################################################
 
-#########################################################################################
-#######    Build and deploy the text translation Google Cloud function
-#######    with a Cloud Pub/Sub trigger, 
-#########################################################################################
-
-resource "google_cloudfunctions_function" "translate_text" {
-  name        = "translate_text"
-  description = "translate text from uploaded file"
-  runtime     = "python39"
-  region      = "us-central1"
-  project     = var.project_id
+# resource "google_cloudfunctions_function" "translate_text" {
+#   name        = "translate_text"
+#   description = "translate text from uploaded file"
+#   runtime     = "python39"
+#   region      = "us-central1"
+#   project     = var.project_id
   
-  available_memory_mb   = 128
-  source_archive_bucket = "terraform1hwp"
-  source_archive_object = "function-source.zip"
-  timeout               = 60
-  entry_point           = "translate_text"
+#   available_memory_mb   = 128
+#   source_archive_bucket = "terraform1hwp"
+#   source_archive_object = "function-source.zip"
+#   timeout               = 60
+#   entry_point           = "translate_text"
 
-   environment_variables = {
-    GCP_PROJECT="${var.project_id}",
-    RESULT_TOPIC="result_topic"
-  }
+#    environment_variables = {
+#     GCP_PROJECT="${var.project_id}",
+#     RESULT_TOPIC="result_topic"
+#   }
 
-  event_trigger {
-    event_type = "google.pubsub.topic.publish"
-    resource = "translate_topic"
-  }
-}
+#   event_trigger {
+#     event_type = "google.pubsub.topic.publish"
+#     resource = "translate_topic"
+#   }
+# }
 
-##########################################################################################
-#####  Build and Deploy Google Cloud Function to save results to Cloud Storage
-##########################################################################################
+# ##########################################################################################
+# #####  Build and Deploy Google Cloud Function to save results to Cloud Storage
+# ##########################################################################################
 
-resource "google_cloudfunctions_function" "save_result" {
-  name        = "save_result"
-  description = "save results to Cloud Storage"
-  runtime     = "python39"
-  region      = "us-central1"
-  project     = var.project_id
+# resource "google_cloudfunctions_function" "save_result" {
+#   name        = "save_result"
+#   description = "save results to Cloud Storage"
+#   runtime     = "python39"
+#   region      = "us-central1"
+#   project     = var.project_id
 
-  available_memory_mb   = 128
-  source_archive_bucket = "terraform1hwp"
-  source_archive_object = "function-source.zip"
-  timeout               = 60
-  entry_point           = "save_result"
+#   available_memory_mb   = 128
+#   source_archive_bucket = "terraform1hwp"
+#   source_archive_object = "function-source.zip"
+#   timeout               = 60
+#   entry_point           = "save_result"
   
-  environment_variables = {
-    GCP_PROJECT="${var.project_id}",
-    RESULT_BUCKET="${var.project_id}-image-output"
-  }
-  event_trigger {
-      event_type= "google.pubsub.topic.publish"
-      resource= "result_topic"
-   }
-}
+#   environment_variables = {
+#     GCP_PROJECT="${var.project_id}",
+#     RESULT_BUCKET="${var.project_id}-image-output"
+#   }
+#   event_trigger {
+#       event_type= "google.pubsub.topic.publish"
+#       resource= "result_topic"
+#    }
+# }
