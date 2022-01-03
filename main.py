@@ -11,14 +11,21 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
+'''
+The below function will halt any instances that are running in a project that has violated
+the 100% threshold of its billing budget.
 
+'''
 import base64
 import json
 import os
 from googleapiclient import discovery
 PROJECT_ID = os.getenv('GCP_PROJECT')
 PROJECT_NAME = f'projects/{PROJECT_ID}'
-def stop_billing(data, context):
+ZONE = 'us-central1-c'
+
+
+def limit_use(data, context):
     pubsub_data = base64.b64decode(data['data']).decode('utf-8')
     pubsub_json = json.loads(pubsub_data)
     cost_amount = pubsub_json['costAmount']
@@ -27,51 +34,48 @@ def stop_billing(data, context):
         print(f'No action necessary. (Current cost: {cost_amount})')
         return
 
-    if PROJECT_ID is None:
-        print('No project specified with environment variable')
-        return
-
-    billing = discovery.build(
-        'cloudbilling',
+    compute = discovery.build(
+        'compute',
         'v1',
         cache_discovery=False,
     )
+    instances = compute.instances()
 
-    projects = billing.projects()
-
-    billing_enabled = __is_billing_enabled(PROJECT_NAME, projects)
-
-    if billing_enabled:
-        __disable_billing_for_project(PROJECT_NAME, projects)
-    else:
-        print('Billing already disabled')
+    instance_names = __list_running_instances(PROJECT_ID, ZONE, instances)
+    __stop_instances(PROJECT_ID, ZONE, instance_names, instances)
 
 
-def __is_billing_enabled(project_name, projects):
+def __list_running_instances(project_id, zone, instances):
     """
-    Determine whether billing is enabled for a project
-    @param {string} project_name Name of project to check if billing is enabled
-    @return {bool} Whether project has billing enabled or not
+    @param {string} project_id ID of project that contains instances to stop
+    @param {string} zone Zone that contains instances to stop
+    @return {Promise} Array of names of running instances
     """
-    try:
-        res = projects.getBillingInfo(name=project_name).execute()
-        return res['billingEnabled']
-    except KeyError:
-        # If billingEnabled isn't part of the return, billing is not enabled
-        return False
-    except Exception:
-        print('Unable to determine if billing is enabled on specified project, assuming billing is enabled')
-        return True
+    res = instances.list(project=project_id, zone=zone).execute()
+
+    if 'items' not in res:
+        return []
+
+    items = res['items']
+    running_names = [i['name'] for i in items if i['status'] == 'RUNNING']
+    return running_names
 
 
-def __disable_billing_for_project(project_name, projects):
+def __stop_instances(project_id, zone, instance_names, instances):
     """
-    Disable billing for a project by removing its billing account
-    @param {string} project_name Name of project disable billing on
+    @param {string} project_id ID of project that contains instances to stop
+    @param {string} zone Zone that contains instances to stop
+    @param {Array} instance_names Names of instance to stop
+    @return {Promise} Response from stopping instances
     """
-    body = {'billingAccountName': ''}  # Disable billing
-    try:
-        res = projects.updateBillingInfo(name=project_name, body=body).execute()
-        print(f'Billing disabled: {json.dumps(res)}')
-    except Exception:
-        print('Failed to disable billing, possibly check permissions')
+    if not len(instance_names):
+        print('No running instances were found.')
+        return
+
+    for name in instance_names:
+        instances.stop(
+          project=project_id,
+          zone=zone,
+          instance=name).execute()
+        print(f'Instance stopped successfully: {name}')
+

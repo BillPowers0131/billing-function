@@ -1,0 +1,12 @@
+{
+    "type": "service_account",
+    "project_id": "ttec-335312",
+    "private_key_id": "a07d670b651a1a37201dfaadd1df927966026f40",
+    "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEvQIBADANBgkqhkiG9w0BAQEFAASCBKcwggSjAgEAAoIBAQCdnSqOWWgNpso8\ntbWS67AVE0sSnk5+jo83PGpVpOqNAr0awyufuWw42q2DdXMxIS4EyojhL9wN/hCj\nPwTDsABqQjy8d2z2OM46aiFFsdl7lA6X7UWoHUaZpAM1cjMoAdVbGXpGdzWrtlKH\nUq7OfWOHj+3tTt2pV8uNauYVNA3VVeFAe0PNQp6mPiEGmOja0Pq9Ak0YNKcUC04h\nWLYrsDsBcR1GPN8aRooYS5pipLLhYsMN/vFKYEksB8IPlN9CLOvHt8rlPH4KuEk1\n0WEWciPg9bLFESyOmL2ut4MomIT14ER+BpxP1eLcbcObww9rgDpHO6eLVMAsrOmP\ng59/XhoXAgMBAAECggEAJPlPmGEk5b7wxlkiJTsg7XC/NbjpVQsAUcbccwbi9v1j\nezm5rBiFaLjz51jQEwBjmUAh6CGgD7BAGuuXpIhPMJ4lPVkOuJwO1Ok8sOrNyA2t\ndrp0ksF7ZGNzVUBa+9GiSWKqqokgkA2PQquE0m/bv1tmRzsvCKDN4XjoTKUPcbH7\nZqGNU4/IrxTI2C9/UXz31FMvoQZK2l5cZDxMlFQJZQqJfX8uBuPPpUyCTzK9vOgR\nfCcAIP0x0y73rru13P9hF7BUX093ko3MJy1Dbae+a22PkRl6ViPhLIB0YCpOQFob\np5AUcG5o/TkQ8IM4YyPCNfUCi35KR56r+GT3qafhUQKBgQDUhEwYjDLhaFfXH2BI\n+0q1B2TFRgRofxj8GO9HbdJDC4X7+CycTFdvxKiH8+MPK93zv8LPXr3PqT0DgjOa\n1bCks8lxqF8Ml57s7rPHgt6Up/XWtkGTIHZ/w0G42cyjU47LzrocbC3R5I2mwMCc\nnLm6KGgeozCarZClZ1Z6i1NR0wKBgQC93QnWR5qKvXV1nSZQ7b13edHRJpRa8eiE\nRvF+t3ZvKtaKPfeO3gWj2XqmEdLXbzgsUTDWjlS7YL49xk4KoZ3HaOWFtAaXSAx+\nZaoHS2OrJPON4oAl14i6ABSyjW2PdvOoJaD0tSbCrdeNF/OMC54U2zNwYy6KcHl8\n9D3LfbloLQKBgQCdMJoEkjbUSVSntvqGIPFaQ3TDAg4iqNf3KA5cvBuJIc3h2OhO\nV51Y+5JYtQme4CiUsaNLtV0aa6jInpbDEQpOWPlIi2x6qO+ReuIZUXCHblDFlxub\n0qgzyl4jd14I9LYrg+ZfPZkKpk4sKGiPrtElo9uXxccesgDKh0wM6l8fpwKBgD00\nr4IjbR+CugXjVkHKkkScwdXh0PuMdn+F+z31WLm3npfMKC0nR7wtVMuKfWSz1vD6\nb3sLQSdypYF2lxv4Q8vP9gXnJiTItjZdAbX+SLAYZmd7+AG6/LmxYvq4evQ/zYaM\nMtoQN+GUdyNl8D5aVGi2zVtSreM1JQTyG6Wo7wc1AoGAMJbazCLuGwhehjbidXwn\nELrVa/xQxxh14MJ07WSbnMKIJk4rtfnuJK0DchSiRXY5MYekB17MOUYJ0x5F2UXZ\nkKospL8buJROoi7KzbZlBci1TIozh7NBCvwR7sztFTFumXYWA5VUA6RFcL2LpN8G\nWaOza5R2+2z+F0NlJCZ9zs4=\n-----END PRIVATE KEY-----\n",
+    "client_email": "ttec-billing-sa@ttec-335312.iam.gserviceaccount.com",
+    "client_id": "117158316831235897452",
+    "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+    "token_uri": "https://oauth2.googleapis.com/token",
+    "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+    "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/ttec-billing-sa%40ttec-335312.iam.gserviceaccount.com"
+  }
