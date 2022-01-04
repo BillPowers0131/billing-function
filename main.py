@@ -25,6 +25,7 @@ PROJECT_NAME = f'projects/{PROJECT_ID}'
 ZONE = 'us-central1-c'
 
 
+
 def limit_use(data, context):
     pubsub_data = base64.b64decode(data['data']).decode('utf-8')
     pubsub_json = json.loads(pubsub_data)

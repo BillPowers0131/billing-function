@@ -3,6 +3,11 @@ variable "project_id" {
     type = string
     default = "cloud-functions-course-324509"
 }
+variable "project" {
+    description = "Name of the project for resource creation."
+    type = string
+    default = "cloud-functions-course-324509"
+}
 
 variable "region" {
     description = "Name of the region for resource creation."
