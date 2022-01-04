@@ -1,4 +1,5 @@
 ttec.json
-archive.zip
 terraform.tfstate
-.terraform
+terraform.tfstate.backup
+archive.zip
+.terraform.lock.hcl
