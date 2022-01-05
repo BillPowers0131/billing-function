@@ -66,34 +66,57 @@ resource "google_project_service" "enable_cloud_pubsub_api" {
 #   bucket = "${var.project_id}-budget_alerts_code_bucket"
 #   source = "main.zip"
 # }
+# resource "google_storage_bucket_object" "archive" {
+#   name   = "archive.zip"
+#   bucket =  "${var.project_id}-budget_alerts_code_bucket"
+#   source = "./python_files"
+# }
 
 #############################################################################
 ######  Creates archive file by zipping main.py and requirements.txt
 #############################################################################
-
-data "archive_file" "zipfile" {
+data "archive_file" "archive_zip" {
   type        = "zip"
-  output_path = "${var.project_id}-budget_alerts_code_bucket/archive.zip"
-   
-  source {
-    content = ".main.py"
-    filename = "main.py"
-  }
-
-  source {
-    content = ".requirements.txt"
-    filename = ".requirements.txt"
-  }
+  source_dir  = "./python_files"
+  output_path = "./archive.zip"
 }
-############################################################################
-#####      Create archive for Function
-############################################################################
 
-resource "google_storage_bucket_object" "archive" {
+resource "google_storage_bucket_object" "archive_zip" {
   name   = "archive.zip"
   bucket = "${var.project_id}-budget_alerts_code_bucket"
-  source = "archive.zip"
+  source = data.archive_file.archive_zip.output_path
 }
+
+
+# data "archive_file" "hello_zip" {
+#   type        = "zip"
+#   source_dir  = "./python_files"
+#   output_path = "archive.zip"
+# }
+
+# data "archive_file" "zipfile" {
+#   type        = "zip"
+#   output_path = "${var.project_id}-budget_alerts_code_bucket/archive.zip"
+   
+#   source {
+#     content = "./python_file/main.py"
+#     filename = "main.py"
+#   }
+
+#   source {
+#     content = "./python_file/requirements.txt"
+#     filename = "requirements.txt"
+#   }
+# }
+# ############################################################################
+# #####      Create archive for Function
+# ############################################################################
+
+# resource "google_storage_bucket_object" "archive" {
+#   name   = "archive.zip"
+#   bucket = "${var.project_id}-budget_alerts_code_bucket"
+#   source = "archive.zip"
+# }
 # #########################################################################################
 # ######   Build the Pub/Sub Budget Notification Topic
 # #########################################################################################
@@ -136,7 +159,7 @@ resource "google_pubsub_topic" "pubsub_budget_alerts_topic" {
 # }
 
 
-# resource "google_billing_budget" "project_budget_alert1" {
+# resource "google_billing_budget" "project_budget_alert" {
 #   #provider        = google-beta
 #   billing_account = data.google_billing_account.account.id
 #   #billing_account = var.billing_account
@@ -163,7 +186,7 @@ resource "google_pubsub_topic" "pubsub_budget_alerts_topic" {
 #       threshold_percent = threshold_rules.value
 #     }
 #   }
-# }
+#}
 # resource "google_pubsub_topic" "pubsub_budget_alerts_topic" {
 #   name    = "budget-alerts-topic"
 #   project = var.project_id
@@ -175,7 +198,7 @@ data "google_billing_account" "account" {
   billing_account = "01E19A-4A22BB-4C0875"
 }
 
-resource "google_billing_budget" "budget2" {
+resource "google_billing_budget" "budget" {
   billing_account = data.google_billing_account.account.id
   display_name = "Example Billing Budget"
 
